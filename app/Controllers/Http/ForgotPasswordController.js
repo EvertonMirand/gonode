@@ -1,6 +1,7 @@
 "use strict";
 
 const User = use("App/Models/User");
+const Mail = use("Mail");
 
 const crypto = require("crypto");
 
@@ -15,6 +16,21 @@ class ForgotPasswordController {
       user.token_created_at = new Date();
 
       await user.save();
+
+      await Mail.send(
+        ["emails.forgot_password"],
+        {
+          email,
+          token: user.token,
+          link: `${request.input("redirect_url")}?token=${user.token}`
+        },
+        message => {
+          message
+            .to(user.email)
+            .from("everton@miranda.com", "Everton | Miranda")
+            .subject("Recuperação de senha");
+        }
+      );
     } catch (err) {
       return response
         .status(err.status)
