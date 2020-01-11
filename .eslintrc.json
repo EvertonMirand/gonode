@@ -1,6 +1,14 @@
 {
+  "env": {
+    "es6": true,
+    "node": true
+  },
   "extends": "standard",
   "globals": {
     "use": true
-  }
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018
+  },
+  "rules": {}
 }
