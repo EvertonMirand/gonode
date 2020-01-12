@@ -47,6 +47,18 @@ class FileController {
       });
     }
   }
+
+  async show({ params, response }) {
+    try {
+      const file = await File.findOrFail(params.id);
+
+      return response.download(Helpers.tmpPath(`uploads/${file.file}`));
+    } catch (err) {
+      error: {
+        message: "Erro ao buscar o arquivo";
+      }
+    }
+  }
 }
 
 module.exports = FileController;
