@@ -11,7 +11,7 @@ class TaskSchema extends Schema {
         .integer("project_id")
         .unsigned()
         .references("id")
-        .inTable("project")
+        .inTable("projects")
         .onUpdate("CASCADE")
         .onDele("CASCADE")
         .notNullabe();
