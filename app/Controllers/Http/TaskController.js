@@ -1,8 +1,10 @@
-'use strict'
+"use strict";
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
+
+const Task = use("App/Models/Task");
 
 /**
  * Resourceful controller for interacting with tasks
@@ -17,19 +19,12 @@ class TaskController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index ({ request, response, view }) {
-  }
-
-  /**
-   * Render a form to be used for creating a new task.
-   * GET tasks/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response, view }) {
+  async index({ params, request, response, view }) {
+    const tasks = await Task.query()
+      .where("project_id", params.projects_id)
+      .with("user")
+      .fetch();
+    return tasks;
   }
 
   /**
@@ -40,7 +35,18 @@ class TaskController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store({ params, request }) {
+    const data = request.only([
+      "user_id",
+      "title",
+      "description",
+      "due_date",
+      "file_id"
+    ]);
+
+    const task = await Task.create({ ...data, project_id: params.projects_id });
+
+    return task;
   }
 
   /**
@@ -52,19 +58,19 @@ class TaskController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
-  }
+  async show({ params, response }) {
+    try {
+      const task = await Task.findOrFail(params.id);
+      await task.load("user");
 
-  /**
-   * Render a form to update an existing task.
-   * GET tasks/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({ params, request, response, view }) {
+      return task;
+    } catch (err) {
+      return response.status(err.status).send({
+        error: {
+          message: "Erro ao encontar o tarefa"
+        }
+      });
+    }
   }
 
   /**
@@ -75,7 +81,26 @@ class TaskController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update({ params, request, response }) {
+    try {
+      const data = request.only([
+        "user_id",
+        "title",
+        "description",
+        "due_date",
+        "file_id"
+      ]);
+      const task = await Task.findOrFail(params.id);
+      task.merge(data);
+      await task.save();
+      return task;
+    } catch (err) {
+      return response.status(err.status).send({
+        error: {
+          message: "Erro ao atualizar o tarefa"
+        }
+      });
+    }
   }
 
   /**
@@ -86,8 +111,19 @@ class TaskController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy({ params, response }) {
+    try {
+      const task = await Task.findOrFail(params.id);
+
+      await task.delete();
+    } catch (err) {
+      return response.status(err.status).send({
+        error: {
+          message: "Erro ao remover o tarefa"
+        }
+      });
+    }
   }
 }
 
-module.exports = TaskController
+module.exports = TaskController;

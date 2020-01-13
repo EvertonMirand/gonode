@@ -31,7 +31,7 @@ class TaskSchema extends Schema {
         .onDelete("SET NULL");
       table.string("title").notNullable();
       table.text("description").notNullable();
-      table.timestamp("dure_date");
+      table.timestamp("due_date");
       table.timestamps();
     });
   }
