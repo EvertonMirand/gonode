@@ -54,9 +54,11 @@ class FileController {
 
       return response.download(Helpers.tmpPath(`uploads/${file.file}`));
     } catch (err) {
-      error: {
-        message: "Erro ao buscar o arquivo";
-      }
+      return response.status(err.status).send({
+        error: {
+          message: "Erro ao buscar o arquivo"
+        }
+      });
     }
   }
 }

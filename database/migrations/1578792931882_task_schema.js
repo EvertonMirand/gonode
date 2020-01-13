@@ -13,24 +13,24 @@ class TaskSchema extends Schema {
         .references("id")
         .inTable("projects")
         .onUpdate("CASCADE")
-        .onDele("CASCADE")
-        .notNullabe();
+        .onDelete("CASCADE")
+        .notNullable();
       table
         .integer("user_id")
         .unsigned()
         .references("id")
         .inTable("users")
         .onUpdate("CASCADE")
-        .onDele("SET NULL");
+        .onDelete("SET NULL");
       table
         .integer("file_id")
         .unsigned()
         .references("id")
         .inTable("files")
         .onUpdate("CASCADE")
-        .onDele("SET NULL");
-      table.string("title").notNullabe();
-      table.tex("description").notNullable();
+        .onDelete("SET NULL");
+      table.string("title").notNullable();
+      table.text("description").notNullable();
       table.timestamp("dure_date");
       table.timestamps();
     });

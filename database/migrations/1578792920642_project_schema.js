@@ -7,15 +7,17 @@ class ProjectSchema extends Schema {
   up() {
     this.create("projects", table => {
       table.increments();
+
       table
         .integer("user_id")
         .unsigned()
         .references("id")
         .inTable("users")
         .onUpdate("CASCADE")
-        .onDele("SET NULL");
+        .onDelete("SET NULL");
+
       table.string("title").notNullable();
-      table.tex("description").notNullable();
+      table.text("description").notNullable();
 
       table.timestamps();
     });
