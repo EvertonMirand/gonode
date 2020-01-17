@@ -1,12 +1,11 @@
 "use strict";
 
-const Mail = use("Mail");
-const Helpers = use("Helpers");
 const TaskHook = (exports = module.exports = {});
 
-TaskHook.sendNewTaskMail = async taskInstance => {
-  console.log(taskInstance.dirty);
+const Kue = use("Kue");
+const Job = use("App/Jobs/NewTaskMail");
 
+TaskHook.sendNewTaskMail = async taskInstance => {
   if (!taskInstance.user_id && !taskInstance.dirty.user_id) {
     return;
   }
@@ -16,25 +15,16 @@ TaskHook.sendNewTaskMail = async taskInstance => {
   const file = await taskInstance.file().fetch();
 
   const { title } = taskInstance;
-
-  await Mail.send(
-    ["emails.new_task"],
+  Kue.dispatch(
+    Job.key,
     {
+      email,
       username,
-      title,
-      hasAttachment: !!file
+      file,
+      title
     },
-    message => {
-      message
-        .to(email)
-        .from("everton@miranda.com", "Everton | Miranda")
-        .subject("Nova tarefa para você");
-
-      if (file) {
-        message.attach(Helpers.tmpPath(`uploads/${file.file}`), {
-          filename: file.name
-        });
-      }
+    {
+      attempts: 3
     }
   );
 };
