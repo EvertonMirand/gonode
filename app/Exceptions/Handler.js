@@ -26,7 +26,7 @@ class ExceptionHandler extends BaseExceptionHandler {
       return response.status(error.status).send(error.messages);
     }
 
-    if (Env.get("NODE_ENV") === "develipment") {
+    if (Env.get("NODE_ENV") === "development") {
       const youch = new Youch(error, request.resquest);
       const errorJSON = await youch.toJSON();
       return response.status(error.status).send(errorJSON);
@@ -45,7 +45,9 @@ class ExceptionHandler extends BaseExceptionHandler {
    *
    * @return {void}
    */
-  async report(error, { request }) {}
+  async report(error, { request }) {
+    console.log(error.message);
+  }
 }
 
 module.exports = ExceptionHandler;
